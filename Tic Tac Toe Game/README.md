@@ -1,7 +1,8 @@
 Tic tac toe game without gui 
+
 How to play:
 
-1- The game is played on a grid that's 3 squares by 3 squares
+1- The game is played on a grid that's 3 squares by 3 squares  
 
 2 -You are X , your friend is O .
 
