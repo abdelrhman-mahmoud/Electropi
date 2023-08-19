@@ -23,6 +23,10 @@ class EDA:
 
     def bar_plot(self, var):
         return self.df[var].value_counts().plot(kind = 'bar')
+    
+    def pie_plot(self, var):
+        return self.df[var].value_counts().plot(kind = 'pie')
+
 
 
     def DistPlot(self, var):
@@ -110,6 +114,12 @@ def plot_univariate(obj_plot, var, radio_plot_uni):
         obj_plot.bar_plot(var)
         st.set_option('deprecation.showPyplotGlobalUse', False)
         st.pyplot()
+    if radio_plot_uni =='pie':
+        st.subheader('bar plot')
+        obj_plot.pie_plot(var)
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        st.pyplot()
+
 
 def plot_multivariate(obj_plot, var2,var3):
 
