@@ -1,8 +1,8 @@
-to run this file 
+xtto run this file 
 run coomand : python -m streamlit run Automated_EDA.py
 requirement :
 pandas 
- numpy 
+numpy 
 seaborn
 plotly 
 streamlit 
