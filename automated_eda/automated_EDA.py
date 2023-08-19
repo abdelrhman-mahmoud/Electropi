@@ -83,7 +83,7 @@ def wrangle(df):
     df_nums.fillna(df_nums.mean(),inplace = True)
 
     # scaling numerical feature
-    df_nums.apply(lambda x: (x - np.mean(x)) / np.std(x))
+    df_nums = df_nums.apply(lambda x: (x - np.mean(x)) / np.std(x))
 
     # encoding categorical features
     if df_cat.shape[1]>=1:
@@ -152,6 +152,9 @@ def main ():
 
         if choose == 'Original Data':
             info(df)
+            show = st.checkbox('shaow data')
+            if show:
+                st.write(df)
             st.markdown('**Numerical summary**')
             df_num = df.select_dtypes(include = np.number)
             if df_num.shape[1] >=1:
@@ -173,6 +176,9 @@ def main ():
 
         elif choose == 'preprocessed Data':
             df = wrangle(df)
+            show = st.checkbox('shaow data')
+            if show:
+                st.write(df)
             info(df)
             st.markdown('**Numerical summary**')
             df_num = df.select_dtypes(include = np.number)
