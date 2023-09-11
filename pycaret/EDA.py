@@ -3,12 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import seaborn as sns
 import plotly.express as px 
-from sklearn.preprocessing import StandardScaler
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import LabelEncoder,OneHotEncoder
-from imblearn.over_sampling import SMOTE
 
 class EDA:
+
     def __init__(self,df,y):
         self.df = df
         self.y = y
@@ -38,5 +35,40 @@ class EDA:
         df1 = pd.get_dummies(df1,drop_first= True)
         
         return df1,y
+
+
+class plotting:
+    def __init__(self):
+        pass
+    def plot_confusion_matrix(self,confusion_matrix, labels):
+        fig, ax = plt.subplots()
+        im = ax.imshow(confusion_matrix, interpolation='nearest', cmap=plt.cm.Blues)
+        ax.figure.colorbar(im, ax=ax)
+        ax.set(xticks=np.arange(confusion_matrix.shape[1]),
+            yticks=np.arange(confusion_matrix.shape[0]),
+            xticklabels=labels, yticklabels=labels,
+            ylabel='True label',
+            xlabel='Predicted label',
+            title='Confusion Matrix')
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+        for i in range(confusion_matrix.shape[0]):
+            for j in range(confusion_matrix.shape[1]):
+                ax.text(j, i, format(confusion_matrix[i, j], 'd'),
+                        ha="center", va="center",
+                        color="white" if confusion_matrix[i, j] > confusion_matrix.max() / 2. else "black")
+        return fig
     
+    def bar_plot(self, feat_imp):
+        return feat_imp.sort_values(key = abs).tail(10).plot(kind = 'barh',xlabel = 'Importance', ylabel='features',title ='Top 10 important features')
+    
+    def ORC_plot(self,fpr, tpr,roc_auc):
+        fig, ax = plt.subplots()
+        ax.plot(fpr, tpr, label=f'AUC = {roc_auc:.2f}')
+        ax.plot([0, 1], [0, 1], 'k--')
+        ax.set_xlim([0.0, 1.0])
+        ax.set_ylim([0.0, 1.05])
+        ax.set_xlabel('False Positive Rate')
+        ax.set_ylabel('True Positive Rate')
+        ax.set_title('Receiver Operating Characteristic')
+        ax.legend(loc='lower right')
         

@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px 
 import streamlit as st 
-from imblearn.over_sampling import SMOTE
+
 from sklearn.model_selection import train_test_split
-from EDA import EDA
+from EDA import EDA,plotting
 from ml import Auto_ML
 def get_data(file):   
     try:
@@ -71,58 +71,88 @@ def main ():
             y = df[target]
             eda = EDA(X,y)
             X,y  = eda.Wrangle()
+            cols = X.columns
             X_train,X_test, y_train,y_test = train_test_split(X,y,test_size=0.2, random_state=42, shuffle= True)
-            auto_ml = Auto_ML(X_train, X_test, y_train, y_test)
+            auto_ml = Auto_ML(X_train, X_test, y_train, y_test,cols)
             if df[target].dtypes in ['int64','float'] and df[target].nunique()>10:
                 st.write('your target indicate to Regression problem')
                 
                 Rmodels= st.radio('Regression Models', ('None','LinearRegression','Ridge', 'SVR', 'DecisionTreeRegressor','RandomForestRegressor','KNeighborsRegressor','GradientBoostingRegressor'))
                 if Rmodels =='LinearRegression':
-                    lr = auto_ml.Linear_regression()
+                    lr,report= auto_ml.Linear_regression()
                     st.write(lr)
+                    st.table(report)
                 if Rmodels == 'Ridge':
-                    ridge = auto_ml.ridge()
+                    ridge ,report= auto_ml.ridge()
                     st.write(ridge)
+                    st.table(report)
                 if Rmodels == 'SVR':
-                    svr = auto_ml.support_vector_regressor()
+                    svr,report = auto_ml.support_vector_regressor()
                     st.write(svr)
+                    st.table(report)
                 if Rmodels == 'DecisionTreeRegressor':
-                    dtr = auto_ml.DTR()
+                    dtr,report = auto_ml.DTR()
                     st.write(dtr)
+                    st.table(report)
                 if Rmodels == 'KNeighborsRegressor':
-                    knnr = auto_ml.KNNR()
+                    knnr,report = auto_ml.KNNR()
                     st.write(knnr)
+                    st.table(report)
                 if Rmodels == 'RandomForestRegressor':
-                    rfr = auto_ml.RFR()
+                    rfr,report = auto_ml.RFR()
                     st.write(rfr)
+                    st.table(report)
                 if Rmodels == 'GradientBoostingRegressor':
-                    gbr = auto_ml.GBR()
+                    gbr,report = auto_ml.GBR()
                     st.write(gbr)
+                    st.table(report)
             else :
                 st.write('your target indicate to classification problem')
                 Cmodels= st.radio('classification Models', ('None','LogisticRegression', 'SVC', 'DecisionTreeClassifier','RandomForestClassifier','KNeighborsClassifier','GradientBoostingClassifier'))
+
                 if Cmodels =='LogisticRegression':
-                    log_r = auto_ml.log_regression()
+                    log_r,report,fig,fig2= auto_ml.log_regression()
                     st.write(log_r)
+                    st.table(report)
+                    st.pyplot(fig)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot(fig2)
+                    
                 if Cmodels == 'SVC':
-                    svc = auto_ml.svc()
+                    svc,report,fig,fig2 = auto_ml.svc()
                     st.write(svc)
+                    st.table(report)
+                    st.pyplot(fig)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot(fig2)
                 if Cmodels == 'DecisionTreeClassifier':
-                    dtc = auto_ml.DTC()
+                    dtc,report,fig,fig2 = auto_ml.DTC()
                     st.write(dtc)
+                    st.table(report)
+                    st.pyplot(fig)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot(fig2)
                 if Cmodels == 'RandomForestClassifier':
-                    rfc = auto_ml.RFC()
+                    rfc,report,fig ,fig2= auto_ml.RFC()
                     st.write(rfc)
+                    st.table(report)
+                    st.pyplot(fig)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot(fig2)
                 if Cmodels == 'KNeighborsClassifier':
-                    knnc = auto_ml.KNNC()
+                    knnc,report,fig,fig2 = auto_ml.KNNC()
                     st.write(knnc)
+                    st.table(report)
+                    st.pyplot(fig)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot(fig2)
                 if Cmodels == 'GradientBoostingClassifier':
-                    gbc = auto_ml.GBC()
+                    gbc,report,fig ,fig2= auto_ml.GBC()
                     st.write(gbc)
-
-        
-
-            
+                    st.table(report)
+                    st.pyplot(fig)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot(fig2)
 
        
 if __name__ == '__main__':
