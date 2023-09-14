@@ -8,6 +8,8 @@ import streamlit as st
 from sklearn.model_selection import train_test_split
 from EDA import EDA,plotting
 from ml import Auto_ML
+
+
 def get_data(file):   
     try:
         df = pd.read_excel(file)
@@ -63,51 +65,136 @@ def main ():
         show = st.checkbox('show information about your data')
         if show:
             info(df)
-        st.header('... Model Testing ...')
-        st.markdown("show every model training - testing score with best hyperparamter")
-        target = st.selectbox('chose your target variable',  df.columns.insert(0,None))
-        if target != None:
+
+        eda = EDA(df)
+        st.header("Data Preprocessing")
+        st.write('.. starting with numerical features ..')
+
+        cols = eda.nums_nulls()
+        
+        if len(cols) !=0:
+            for i, col in enumerate(cols):
+                st.write(col)
+                tech = st.selectbox('select technique',('mean','median','mode'),key = f'A{i}')
+                if tech == 'mean':
+                    df = eda.fill_with_mean(col)
+                
+                if tech == 'median':
+                    df = eda.fill_with_median(col)
+                    
+                if tech == 'mode':
+                    df = eda.fill_with_mode(col)
+        else :
+            st.write('no detected nulls in numerical features')
+
+        st.write(" ")
+        st.write( 'following with categorical features')
+        cat_cols = eda.cat_nulls()
+        if len(cat_cols) !=0:
+            for i, col in enumerate(cat_cols):
+                tech = st.selectbox('select technique',('mode','Other'),key = f'B{i}')
+                if tech == 'mode':
+                    df = eda.fill_with_mode(col)
+                    
+                if tech == 'Other':
+                    value = st.text_input('Enter your constant value')
+                    df = eda.fill_with_constant(col,value)
+                    
+ 
+        else :
+            st.write('no detected nulls in categorical features')
+
+        st.write(" ")
+
+        st.write("Great, You have completed the first step of data preprocessing")
+        st.write(" ")
+        st.write(" ")
+        # st.write("it's time to encode your categorical feature")
+        
+        target = st.selectbox('chose your target variable',  df.columns.insert(0,'None'))
+      
+
+                
+        if target != 'None':
+            problem = None
+            if df[target].dtypes in ['int64','float'] and df[target].nunique()>=10:
+                problem = 'Regression'
+            else :
+                problem = 'Classification'
+                df = eda.label_encoder(target)
+            df = eda.encoding(df)
             X = df.drop(target, axis = 1)
             y = df[target]
-            eda = EDA(X,y)
-            X,y  = eda.Wrangle()
-            cols = X.columns
+            eda = EDA(X)
+            cat_cols = eda.cat_feat()
+            
             X_train,X_test, y_train,y_test = train_test_split(X,y,test_size=0.2, random_state=42, shuffle= True)
-            auto_ml = Auto_ML(X_train, X_test, y_train, y_test,cols)
-            if df[target].dtypes in ['int64','float'] and df[target].nunique()>10:
-                st.write('your target indicate to Regression problem')
-                
+            cols  = X.columns
+            auto_ml = Auto_ML(X,y,X_train, X_test, y_train, y_test,cols)
+           
+            if problem == 'Regression':
+                st.write('your target indicate to Regression Problem')
                 Rmodels= st.radio('Regression Models', ('None','LinearRegression','Ridge', 'SVR', 'DecisionTreeRegressor','RandomForestRegressor','KNeighborsRegressor','GradientBoostingRegressor'))
                 if Rmodels =='LinearRegression':
-                    lr,report= auto_ml.Linear_regression()
-                    st.write(lr)
+                    model,report,graph1,graph2= auto_ml.Linear_regression()
+                    st.write(model)
                     st.table(report)
+                    st.pyplot(graph1)
+                    plt.close(graph1)
+                    st.pyplot(graph2)
+                    plt.close(graph2)
+                   
+            
                 if Rmodels == 'Ridge':
-                    ridge ,report= auto_ml.ridge()
-                    st.write(ridge)
+                    model,report,graph1,graph2 = auto_ml.ridge()
+                    st.write(model)
                     st.table(report)
+                    st.pyplot(graph1)
+                    plt.close(graph1)
+                    st.pyplot(graph2)
+                    plt.close(graph2)
+                
                 if Rmodels == 'SVR':
-                    svr,report = auto_ml.support_vector_regressor()
-                    st.write(svr)
+                    model,report,fig= auto_ml.support_vector_regressor()
+                    st.write(model)
                     st.table(report)
+                    
+                    st.pyplot(fig)
+
                 if Rmodels == 'DecisionTreeRegressor':
-                    dtr,report = auto_ml.DTR()
-                    st.write(dtr)
-                    st.table(report)
+                    model,report,graph1, graph2= auto_ml.DTR()
+                    st.write(model)
+                    st.pyplot(graph1)
+                    plt.close(graph1)
+                    st.pyplot(graph2)
+                    plt.close(graph2)
+
                 if Rmodels == 'KNeighborsRegressor':
-                    knnr,report = auto_ml.KNNR()
-                    st.write(knnr)
+                    model,report,graph1,graph2= auto_ml.KNNR()
+                    st.write(model)
                     st.table(report)
+                    st.pyplot(graph1)
+                    plt.close(graph1)
+                    st.pyplot(graph2)
+                    plt.close(graph2)
+
                 if Rmodels == 'RandomForestRegressor':
-                    rfr,report = auto_ml.RFR()
-                    st.write(rfr)
-                    st.table(report)
+                    model,report,graph1, graph2= auto_ml.RFR()
+                    st.write(model)
+                    st.pyplot(graph1)
+                    plt.close(graph1)
+                    st.pyplot(graph2)
+                    plt.close(graph2)
                 if Rmodels == 'GradientBoostingRegressor':
-                    gbr,report = auto_ml.GBR()
-                    st.write(gbr)
-                    st.table(report)
+                    model,report,graph1, graph2= auto_ml.GBR()
+                    st.write(model)
+                    st.pyplot(graph1)
+                    plt.close(graph1)
+                    st.pyplot(graph2)
+                    plt.close(graph2)
+
             else :
-                st.write('your target indicate to classification problem')
+                st.write('your target indicate to Classification Problem')
                 Cmodels= st.radio('classification Models', ('None','LogisticRegression', 'SVC', 'DecisionTreeClassifier','RandomForestClassifier','KNeighborsClassifier','GradientBoostingClassifier'))
 
                 if Cmodels =='LogisticRegression':
@@ -153,6 +240,7 @@ def main ():
                     st.pyplot(fig)
                     st.set_option('deprecation.showPyplotGlobalUse', False)
                     st.pyplot(fig2)
+
 
        
 if __name__ == '__main__':

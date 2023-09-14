@@ -15,17 +15,24 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler,OneHotEncoder
 from imblearn.over_sampling import SMOTE
 from EDA import plotting
-from yellowbrick.model_selection import LearningCurve
+from yellowbrick.model_selection import learning_curve
+from sklearn.model_selection import ShuffleSplit
+from sklearn.inspection import permutation_importance
+import matplotlib.pyplot as plt
+
+
 
 fig = plotting()
 
 class Auto_ML:
-    def __init__(self,X_train,X_test,y_train,y_test,cols):
+    def __init__(self,X,y,X_train,X_test,y_train,y_test,cols):
         self.X_train = X_train
         self.X_test = X_test
         self.y_train = y_train
         self.y_test = y_test
         self.cols = cols
+        self.X = X
+        self.y = y
        
     
     def Linear_regression(self):
@@ -38,7 +45,6 @@ class Auto_ML:
         param_grid = {
             'regressor__fit_intercept': [True, False]
         }
-
         grid_search = GridSearchCV(pipeline, param_grid, cv=5)
         grid_search.fit(self.X_train, self.y_train) 
 
@@ -62,9 +68,17 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose()         
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve Linear Regression", self.X, self.y)
+        plt.close(f)
+        pipeline.fit(self.X_train, self.y_train)
+        perm_importance = permutation_importance(pipeline, self.X_test, self.y_test, n_repeats=30, random_state=0)
+        feature_importances = perm_importance.importances_mean
+        f2 = fig.feature_importance_plot(feature_importances, self.cols)
+
+        return scores,df,f,f2
 
 
     def ridge(self):
@@ -77,9 +91,8 @@ class Auto_ML:
             'ridge__alpha': [0.1, 1.0, 10.0],
             'ridge__solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga'],
         }
-
         grid_search = GridSearchCV(pipeline, param_grid, cv=5)
-        grid_search.fit(self.X_train, self.y_train)
+        grid_search.fit(self.X_train, self.y_train) 
 
         best_estimator = grid_search.best_estimator_
 
@@ -101,9 +114,17 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose() 
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve Ridge ", self.X, self.y)
+        pipeline.fit(self.X_train, self.y_train)
+        perm_importance = permutation_importance(pipeline, self.X_test, self.y_test, n_repeats=30, random_state=0)
+        feature_importances = perm_importance.importances_mean
+        f2 = fig.feature_importance_plot(feature_importances, self.cols)
+
+        return scores,df,f,f2
+
         
     
     def support_vector_regressor(self):
@@ -117,7 +138,7 @@ class Auto_ML:
             ('scaler', StandardScaler()),  
             ('svr', SVR())
             ])
-    
+
         grid_search = GridSearchCV(pipeline, param_grid, cv=5)
         grid_search.fit(self.X_train, self.y_train) 
 
@@ -141,9 +162,13 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose() 
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve Sunpport Vector Regressor", self.X, self.y)
+
+        return scores,df,f
+
     
     def DTR(self):
         param_grid = {
@@ -182,9 +207,15 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose() 
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve Decision Tree Regressor", self.X, self.y)
+        plt.close(f)
+        pipeline.fit(self.X_train, self.y_train)
+        feature_importances = pipeline.named_steps['dt'].feature_importances_
+        f2 = fig.feature_importance_plot(feature_importances, self.cols)
+        return scores,df,f,f2
     
 
     def KNNR(self):
@@ -225,9 +256,19 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose() 
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve K_nearst neigbour Regressor ", self.X, self.y)
+
+        pipeline.fit(self.X_train,self.y_train)
+        perm_importance = permutation_importance(pipeline, self.X_test, self.y_test, n_repeats=30, random_state=0)
+        feature_importances = perm_importance.importances_mean
+        f2 = fig.feature_importance_plot(feature_importances, self.cols)
+
+        return scores,df,f,f2
+
+
 
     def RFR(self):
         pipeline = Pipeline([
@@ -264,9 +305,17 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose() 
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve Random Forest Regressor", self.X, self.y)
+        plt.close(f)
+        pipeline.fit(self.X_train,self.y_train)
+        feature_importances = pipeline.named_steps['regressor'].feature_importances_
+        f2 = fig.feature_importance_plot(feature_importances, self.cols)
+
+        return scores,df,f,f2
+
     
     def GBR(self):
         pipeline = Pipeline([
@@ -280,13 +329,6 @@ class Auto_ML:
             'regressor__learning_rate': [0.01, 0.1, 1.0],
             'regressor__max_depth': [3, 5, 7]
         }
-
-        grid_search = GridSearchCV(
-            pipeline,
-            param_grid,
-            cv=5  
-        )
-
         grid_search = GridSearchCV(pipeline, param_grid, cv=5)
         grid_search.fit(self.X_train, self.y_train) 
 
@@ -310,9 +352,22 @@ class Auto_ML:
         }
         Metric =  ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error','R-squared']
 
-        df = pd.DataFrame(data,index = Metric).transpose()
-        
-        return scores,df
+        df = pd.DataFrame(data,index = Metric).transpose() 
+
+        # Plot the learning curve
+        f= fig.plot_learning_curve(best_estimator, "Learning Curve Gredient Boosting Regressor", self.X, self.y)
+
+        plt.close(f)
+        pipeline.fit(self.X_train, self.y_train)
+        feature_importances = pipeline.named_steps['regressor'].feature_importances_
+        f2 = fig.feature_importance_plot(feature_importances, self.cols)
+
+
+        return scores,df,f,f2
+    
+
+
+
     
     def log_regression(self):
         pipeline = Pipeline([
@@ -346,18 +401,7 @@ class Auto_ML:
         roc_auc = auc(fpr, tpr)
         figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
 
-        # sizes = np.linspace(0.3, 1.0, 10)
-
-        # # Instantiate the classification model and visualizer
-       
-        # visualizer = LearningCurve(
-        #     pipeline, cv=5, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
-        # )
-
-        # visualizer.fit(self.X_train, self.y_train)        # Fit the data to the visualizer
-        # visualizer.show()     
-
-
+        
         return scores, report,figure,figure2
     
 
