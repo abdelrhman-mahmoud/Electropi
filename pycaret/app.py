@@ -110,8 +110,9 @@ def main ():
         st.write(" ")
         st.write(" ")
         # st.write("it's time to encode your categorical feature")
-        
-        target = st.selectbox('chose your target variable',  df.columns.insert(0,'None'))
+    
+        st.write('select the target variable to auto detect problem(Regression - Classification)')
+        target = st.selectbox('choose your target variable',  df.columns.insert(0,'None'))
       
 
                 
@@ -134,8 +135,11 @@ def main ():
            
             if problem == 'Regression':
                 st.write('your target indicate to Regression Problem')
+                st.header('Model Testing ')
+                st.write('Select a Regression Model to show evalution with hyperparameter tuning ')
                 Rmodels= st.radio('Regression Models', ('None','LinearRegression','Ridge', 'SVR', 'DecisionTreeRegressor','RandomForestRegressor','KNeighborsRegressor','GradientBoostingRegressor'))
                 if Rmodels =='LinearRegression':
+                    
                     model,report,graph1,graph2= auto_ml.Linear_regression()
                     st.write(model)
                     st.table(report)
@@ -195,6 +199,8 @@ def main ():
 
             else :
                 st.write('your target indicate to Classification Problem')
+                st.header('Model Testing ')
+                st.write('Select a Classification Model to show evalution with hyperparameter tuning ')
                 Cmodels= st.radio('classification Models', ('None','LogisticRegression', 'SVC', 'DecisionTreeClassifier','RandomForestClassifier','KNeighborsClassifier','GradientBoostingClassifier'))
 
                 if Cmodels =='LogisticRegression':
