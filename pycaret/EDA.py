@@ -10,7 +10,8 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
 
-
+sns.set(style="whitegrid")
+plt.grid(False)
 class EDA:
 
     def __init__(self,df):
@@ -113,7 +114,7 @@ class plotting:
 
 
     # Create a function to plot the learning curve
-    def plot_learning_curve(self,estimator, title, X, y):
+    def plot_learning_curve_R(self,estimator, title, X, y):
 
         fig, ax = plt.subplots()
        
@@ -130,7 +131,39 @@ class plotting:
         test_scores_mean = np.mean(test_scores, axis=1)
         test_scores_std = np.std(test_scores, axis=1)
         
-        # plt.grid()
+        plt.grid(False)
+
+        plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
+                     train_scores_mean + train_scores_std, alpha=0.1,
+                     color="r")
+        plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
+                        test_scores_mean + test_scores_std, alpha=0.1, color="g")
+        plt.plot(train_sizes, train_scores_mean, 'o-', color="r",
+                label="Training score")
+        plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
+                label="Cross-validation score")
+
+        ax.legend(loc="best")
+        return fig
+    
+    def plot_learning_curve_C(self,estimator, title, X, y):
+
+        fig, ax = plt.subplots()
+       
+        plt.title(title)
+        ax.set_xlabel("Training examples")
+        ax.set_ylabel("accuracy")  # You can use other regression metrics as needed
+        ax.set_title(title)
+
+        train_sizes, train_scores,test_scores = learning_curve(
+            estimator, X, y, cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0), n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 5), scoring='accuracy')
+        
+        train_scores_mean = np.mean(train_scores, axis=1)
+        train_scores_std = np.std(train_scores, axis=1)
+        test_scores_mean = np.mean(test_scores, axis=1)
+        test_scores_std = np.std(test_scores, axis=1)
+        
+        plt.grid(False)
 
         plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
                      train_scores_mean + train_scores_std, alpha=0.1,

@@ -19,8 +19,10 @@ from yellowbrick.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
 from sklearn.inspection import permutation_importance
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-
+sns.set(style="whitegrid")
+plt.grid(False)
 
 fig = plotting()
 
@@ -71,7 +73,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose()         
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve Linear Regression", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve Linear Regression", self.X, self.y)
         plt.close(f)
         pipeline.fit(self.X_train, self.y_train)
         perm_importance = permutation_importance(pipeline, self.X_test, self.y_test, n_repeats=30, random_state=0)
@@ -117,7 +119,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose() 
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve Ridge ", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve Ridge ", self.X, self.y)
         pipeline.fit(self.X_train, self.y_train)
         perm_importance = permutation_importance(pipeline, self.X_test, self.y_test, n_repeats=30, random_state=0)
         feature_importances = perm_importance.importances_mean
@@ -165,7 +167,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose() 
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve Sunpport Vector Regressor", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve Sunpport Vector Regressor", self.X, self.y)
 
         return scores,df,f
 
@@ -210,7 +212,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose() 
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve Decision Tree Regressor", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve Decision Tree Regressor", self.X, self.y)
         plt.close(f)
         pipeline.fit(self.X_train, self.y_train)
         feature_importances = pipeline.named_steps['dt'].feature_importances_
@@ -259,7 +261,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose() 
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve K_nearst neigbour Regressor ", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve K_nearst neigbour Regressor ", self.X, self.y)
 
         pipeline.fit(self.X_train,self.y_train)
         perm_importance = permutation_importance(pipeline, self.X_test, self.y_test, n_repeats=30, random_state=0)
@@ -308,7 +310,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose() 
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve Random Forest Regressor", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve Random Forest Regressor", self.X, self.y)
         plt.close(f)
         pipeline.fit(self.X_train,self.y_train)
         feature_importances = pipeline.named_steps['regressor'].feature_importances_
@@ -355,7 +357,7 @@ class Auto_ML:
         df = pd.DataFrame(data,index = Metric).transpose() 
 
         # Plot the learning curve
-        f= fig.plot_learning_curve(best_estimator, "Learning Curve Gredient Boosting Regressor", self.X, self.y)
+        f= fig.plot_learning_curve_R(best_estimator, "Learning Curve Gredient Boosting Regressor", self.X, self.y)
 
         plt.close(f)
         pipeline.fit(self.X_train, self.y_train)
@@ -370,6 +372,7 @@ class Auto_ML:
 
     
     def log_regression(self):
+        
         pipeline = Pipeline([
             ('sampling', SMOTE(random_state= 42)),
             ('scaler', StandardScaler()),
@@ -397,12 +400,12 @@ class Auto_ML:
         cm = confusion_matrix(self.y_test, y_pred)
         figure = fig.plot_confusion_matrix(cm,np.unique(y_pred))
 
-        fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
-        roc_auc = auc(fpr, tpr)
-        figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
-
+        # fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
+        # roc_auc = auc(fpr, tpr)
+        # figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        f= fig.plot_learning_curve_C(best_estimator, "Learning Curve Logisic Regression Classifier", self.X, self.y)
         
-        return scores, report,figure,figure2
+        return scores, report,figure, f
     
 
     def KNNC (self):
@@ -431,9 +434,10 @@ class Auto_ML:
         cm = confusion_matrix(self.y_test, y_pred)
         figure = fig.plot_confusion_matrix(cm,np.unique(y_pred))
 
-        fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
-        roc_auc = auc(fpr, tpr)
-        figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        # fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
+        # roc_auc = auc(fpr, tpr)
+        # figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        figure2= fig.plot_learning_curve_C(best_estimator, "Learning Curve Logisic Regression Classifier", self.X, self.y)
 
         return scores, report,figure,figure2
 
@@ -466,9 +470,11 @@ class Auto_ML:
         cm = confusion_matrix(self.y_test, y_pred)
         figure = fig.plot_confusion_matrix(cm,np.unique(y_pred))
 
-        fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
-        roc_auc = auc(fpr, tpr)
-        figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        # fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
+        # roc_auc = auc(fpr, tpr)
+        # figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        figure2= fig.plot_learning_curve_C(best_estimator, "Learning Curve Logisic Regression Classifier", self.X, self.y)
+
 
         return scores, report,figure,figure2
 
@@ -500,9 +506,10 @@ class Auto_ML:
         cm = confusion_matrix(self.y_test, y_pred)
         figure = fig.plot_confusion_matrix(cm,np.unique(y_pred))
 
-        fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
-        roc_auc = auc(fpr, tpr)
-        figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        # fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
+        # roc_auc = auc(fpr, tpr)
+        # figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        figure2= fig.plot_learning_curve_C(best_estimator, "Learning Curve Logisic Regression Classifier", self.X, self.y)
 
         
         return scores, report,figure,figure2
@@ -533,9 +540,10 @@ class Auto_ML:
         cm = confusion_matrix(self.y_test, y_pred)
         figure = fig.plot_confusion_matrix(cm,np.unique(y_pred))
 
-        fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
-        roc_auc = auc(fpr, tpr)
-        figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        # fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
+        # roc_auc = auc(fpr, tpr)
+        # figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        figure2 = fig.plot_learning_curve_C(best_estimator, "Learning Curve Logisic Regression Classifier", self.X, self.y)
 
         return scores, report,figure,figure2
     
@@ -567,8 +575,10 @@ class Auto_ML:
         cm = confusion_matrix(self.y_test, y_pred)
         figure = fig.plot_confusion_matrix(cm,np.unique(y_pred))
 
-        fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
-        roc_auc = auc(fpr, tpr)
-        figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        # fpr, tpr, thresholds = roc_curve(y_pred, self.y_test)
+        # roc_auc = auc(fpr, tpr)
+        # figure2 = fig.ORC_plot(fpr, tpr ,roc_auc)
+        figure2= fig.plot_learning_curve_C(best_estimator, "Learning Curve Logisic Regression Classifier", self.X, self.y)
+
 
         return scores, report,figure,figure2
